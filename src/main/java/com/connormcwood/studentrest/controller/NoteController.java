@@ -23,7 +23,7 @@ public class NoteController {
     }
 
     @PostMapping
-    public Note createNode(@Valid @RequestBody Note note) {
+    public Note createNote(@Valid @RequestBody Note note) {
         return noteRepository.save(note);
     }
 
@@ -32,7 +32,7 @@ public class NoteController {
         return findNoteByIdOrThrow(noteId);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public Note updateNote(@PathVariable(value = "id") Long noteId, @Valid @RequestBody Note noteDetails) {
         Note note = findNoteByIdOrThrow(noteId);
 

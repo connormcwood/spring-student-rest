@@ -7,20 +7,19 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "notes")
+@Table(name = "categories")
 @JsonIgnoreProperties(value = {"createdAt", "updatedAt"},
         allowGetters = true)
 @EntityListeners(AuditingEntityListener.class)
-public class Note implements Serializable {
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "note_id")
+    @Column(name = "category_id")
     private Long id;
 
     @NotBlank
@@ -39,17 +38,12 @@ public class Note implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinTable(
-            name = "Note_Category",
-            joinColumns = { @JoinColumn(name = "note_id") },
-            inverseJoinColumns = { @JoinColumn(name = "category_id") }
-    )
-    Set<Category> categories = new HashSet<>();
+    @ManyToMany(mappedBy = "categories")
+    private Set<Note> notes = new HashSet<>();
 
-    public Note() { }
+    public Category() { }
 
-    public Note(Note note) {
+    public Category(Note note) {
         this.title = note.getTitle();
         this.content = note.getContent();
         this.createdAt = note.getCreatedAt();
