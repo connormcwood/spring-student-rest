@@ -43,11 +43,11 @@ public class Category {
 
     public Category() { }
 
-    public Category(Note note) {
-        this.title = note.getTitle();
-        this.content = note.getContent();
-        this.createdAt = note.getCreatedAt();
-        this.updatedAt = note.getUpdatedAt();
+    public Category(Category category) {
+        this.title = category.getTitle();
+        this.content = category.getContent();
+        this.createdAt = category.getCreatedAt();
+        this.updatedAt = category.getUpdatedAt();
     }
 
     public Long getId() {

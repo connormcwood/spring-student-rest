@@ -1,29 +1,26 @@
 package com.connormcwood.studentrest.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "notes")
-@JsonIgnoreProperties(value = {"createdAt", "updatedAt"},
+@Table(name = "priorities")
+@JsonIgnoreProperties(value = {"createdAt", "updatedAt", "hibernateLazyInitializer", "handler"},
         allowGetters = true)
 @EntityListeners(AuditingEntityListener.class)
-public class Note implements Serializable {
+public class Priority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "note_id")
+    @Column(name = "priority_id")
     private Long id;
 
     @NotBlank
@@ -42,31 +39,13 @@ public class Note implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    //@Column(name = "priority_id", nullable = false, updatable = false)
-    //private Long priority_id;
+    public Priority() { }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "priority_id", referencedColumnName = "priority_id", insertable = false, updatable = false)
-    @JsonManagedReference
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    public Priority priority;
-
-    @ManyToMany(cascade = { CascadeType.ALL })
-    @JoinTable(
-            name = "Note_Category",
-            joinColumns = { @JoinColumn(name = "note_id") },
-            inverseJoinColumns = { @JoinColumn(name = "category_id") }
-    )
-    Set<Category> categories = new HashSet<>();
-
-    public Note() { }
-
-    public Note(Note note) {
-        this.title = note.getTitle();
-        this.content = note.getContent();
-        this.createdAt = note.getCreatedAt();
-        this.updatedAt = note.getUpdatedAt();
-        this.priority = note.getPriority();
+    public Priority(Priority priority) {
+        this.title = priority.getTitle();
+        this.content = priority.getContent();
+        this.createdAt = priority.getCreatedAt();
+        this.updatedAt = priority.getUpdatedAt();
     }
 
     public Long getId() {
@@ -107,13 +86,5 @@ public class Note implements Serializable {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public Priority getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Priority priority) {
-        this.priority = priority;
     }
 }
