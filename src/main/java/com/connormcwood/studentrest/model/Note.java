@@ -42,14 +42,15 @@ public class Note implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    //@Column(name = "priority_id", nullable = false, updatable = false)
-    //private Long priority_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "priority_id", referencedColumnName = "priority_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Priority priority;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "priority_id", referencedColumnName = "priority_id", insertable = false, updatable = false)
-    @JsonManagedReference
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    public Priority priority;
+    private User user;
 
     @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(
@@ -116,4 +117,9 @@ public class Note implements Serializable {
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
+
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
+
 }

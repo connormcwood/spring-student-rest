@@ -1,8 +1,13 @@
 package com.connormcwood.studentrest.controller;
 
+import com.connormcwood.studentrest.exception.ChildResourceNotFoundException;
 import com.connormcwood.studentrest.exception.ResourceNotFoundException;
 import com.connormcwood.studentrest.model.Note;
+import com.connormcwood.studentrest.model.Priority;
+import com.connormcwood.studentrest.model.User;
 import com.connormcwood.studentrest.repository.NoteRepository;
+import com.connormcwood.studentrest.repository.PriorityRepository;
+import com.connormcwood.studentrest.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +22,12 @@ public class NoteController {
     @Autowired
     NoteRepository noteRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PriorityRepository priorityRepository;
+
     @GetMapping("/all")
     public List<Note> getAllNotes() {
         return noteRepository.findAll();
@@ -24,6 +35,13 @@ public class NoteController {
 
     @PostMapping
     public Note createNote(@Valid @RequestBody Note note) {
+        System.out.println(note.getPriority().getId());
+
+        note.setPriority(priorityRepository.findById(note.getPriority().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getPriority().getId(), "Priority")));
+        note.setUser(userRepository.findById(note.getUser().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getUser().getId(), "User")));
+        note.setTitle(note.getTitle());
+        note.setContent(note.getContent());
+
         return noteRepository.save(note);
     }
 
@@ -35,7 +53,8 @@ public class NoteController {
     @PatchMapping("/{id}")
     public Note updateNote(@PathVariable(value = "id") Long noteId, @Valid @RequestBody Note noteDetails) {
         Note note = findNoteByIdOrThrow(noteId);
-
+        note.setPriority(priorityRepository.findById(note.getPriority().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getPriority().getId(), "Priority")));
+        note.setUser(userRepository.findById(note.getUser().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getUser().getId(), "User")));
         note.setTitle(noteDetails.getTitle());
         note.setContent(noteDetails.getContent());
 
