@@ -3,8 +3,6 @@ package com.connormcwood.studentrest.controller;
 import com.connormcwood.studentrest.exception.ChildResourceNotFoundException;
 import com.connormcwood.studentrest.exception.ResourceNotFoundException;
 import com.connormcwood.studentrest.model.Note;
-import com.connormcwood.studentrest.model.Priority;
-import com.connormcwood.studentrest.model.User;
 import com.connormcwood.studentrest.repository.NoteRepository;
 import com.connormcwood.studentrest.repository.PriorityRepository;
 import com.connormcwood.studentrest.repository.UserRepository;
@@ -38,7 +36,11 @@ public class NoteController {
         System.out.println(note.getPriority().getId());
 
         note.setPriority(priorityRepository.findById(note.getPriority().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getPriority().getId(), "Priority")));
-        note.setUser(userRepository.findById(note.getUser().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getUser().getId(), "User")));
+
+        if(note.getUser() != null) {
+            note.setUser(userRepository.findById(note.getUser().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getUser().getId(), "User")));
+        }
+
         note.setTitle(note.getTitle());
         note.setContent(note.getContent());
 
@@ -54,17 +56,21 @@ public class NoteController {
     public Note updateNote(@PathVariable(value = "id") Long noteId, @Valid @RequestBody Note noteDetails) {
         Note note = findNoteByIdOrThrow(noteId);
         note.setPriority(priorityRepository.findById(note.getPriority().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getPriority().getId(), "Priority")));
-        note.setUser(userRepository.findById(note.getUser().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getUser().getId(), "User")));
+        if(note.getUser() != null) {
+            note.setUser(userRepository.findById(note.getUser().getId()).orElseThrow(() -> new ChildResourceNotFoundException("Note", "id", note.getUser().getId(), "User")));
+        }
         note.setTitle(noteDetails.getTitle());
         note.setContent(noteDetails.getContent());
 
         return noteRepository.save(note);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteNote(@PathVariable(value = "id") Long noteId) {
-        Note note = findNoteByIdOrThrow(noteId);
-        noteRepository.delete(note);
+    @RequestMapping(value = "/{ids}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> deleteNotes(@PathVariable List<Integer> ids) {
+        for(Integer id : ids) {
+            Note note = findNoteByIdOrThrow(Long.valueOf(id));
+            noteRepository.delete(note);
+        }
         return ResponseEntity.ok().build();
     }
 

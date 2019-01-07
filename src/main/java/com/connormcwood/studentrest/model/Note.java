@@ -30,6 +30,7 @@ public class Note implements Serializable {
     private String title;
 
     @NotBlank
+    @org.hibernate.annotations.Type( type = "text" )
     private String content;
 
     @Column(name = "created_at", nullable = false, updatable = false)
