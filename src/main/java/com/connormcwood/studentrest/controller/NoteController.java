@@ -6,11 +6,15 @@ import com.connormcwood.studentrest.model.Note;
 import com.connormcwood.studentrest.repository.NoteRepository;
 import com.connormcwood.studentrest.repository.PriorityRepository;
 import com.connormcwood.studentrest.repository.UserRepository;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -28,7 +32,7 @@ public class NoteController {
 
     @GetMapping("/all")
     public List<Note> getAllNotes() {
-        return noteRepository.findAll();
+        return noteRepository.findAllByOrderByOrderAsc();
     }
 
     @PostMapping
@@ -72,6 +76,30 @@ public class NoteController {
             noteRepository.delete(note);
         }
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/reorder", method = RequestMethod.PATCH)
+    public ResponseEntity<?> reorderNotes(@RequestBody String body) {
+        try {
+            JSONArray jsonArray = new JSONArray(body);
+            for(int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                System.out.println(jsonObject.toString());
+                Long noteId = new Long((Integer)jsonObject.get("id"));
+                Long orderId = new Long((Integer)jsonObject.get("order"));
+
+                Note note = findNoteByIdOrThrow(noteId);
+                note.setOrder(orderId);
+                noteRepository.save(note);
+            }
+            System.out.println("Heres");
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println(body);
+
+        return null;
     }
 
     private Note findNoteByIdOrThrow(Long noteId) {

@@ -1,9 +1,8 @@
 package com.connormcwood.studentrest.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,7 +29,7 @@ public class Note implements Serializable {
     private String title;
 
     @NotBlank
-    @org.hibernate.annotations.Type( type = "text" )
+    @Type( type = "text" )
     private String content;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -52,6 +51,10 @@ public class Note implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User user;
+
+    @Column(name = "order_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Long order;
 
     @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(
@@ -123,4 +126,8 @@ public class Note implements Serializable {
 
     public void setUser(User user) { this.user = user; }
 
+    @JsonIgnore
+    public long getOrder() { return order; }
+
+    public void setOrder(Long order) { this.order = order; }
 }
