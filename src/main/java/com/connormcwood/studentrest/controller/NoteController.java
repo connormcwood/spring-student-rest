@@ -47,7 +47,7 @@ public class NoteController {
 
         note.setTitle(note.getTitle());
         note.setContent(note.getContent());
-
+        note.setOrder(Long.valueOf(noteRepository.findHighestOrderId() + 1));
         return noteRepository.save(note);
     }
 
@@ -92,14 +92,11 @@ public class NoteController {
                 note.setOrder(orderId);
                 noteRepository.save(note);
             }
-            System.out.println("Heres");
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
-        System.out.println(body);
-
-        return null;
+        return ResponseEntity.ok().build();
     }
 
     private Note findNoteByIdOrThrow(Long noteId) {
